@@ -2,17 +2,14 @@ const bodyElement = document.getElementById('body');
 const imageInput = document.getElementById('imageInput');
 
 bodyElement.addEventListener('dragover', (e) => {
-    e.preventDefault();  // This is necessary to allow drop.
+    e.preventDefault();  
 });
 
 bodyElement.addEventListener('drop', (e) => {
     e.preventDefault();
 
-    if (e.dataTransfer.items) {
-        if (e.dataTransfer.items[0].kind === 'file') {
-            const file = e.dataTransfer.items[0].getAsFile();
-            imageInput.files = e.dataTransfer.files;
-        }
+    if (e.dataTransfer.items && e.dataTransfer.items[0].kind === 'file') {
+        imageInput.files = e.dataTransfer.files;
     }
 });
 
@@ -23,46 +20,39 @@ document.getElementById('compareButton').addEventListener('click', function() {
     const parser = new DOMParser();
     const doc = parser.parseFromString(htmlContent, 'text/html');
     
-    // Extract image sources from img tags
     const imgTags = doc.querySelectorAll('img');
     const srcValues = Array.from(imgTags).map(img => img.getAttribute('src'));
 
-    // Extract images from inline background styles
     const inlineBackgroundImages = Array.from(doc.querySelectorAll('[style*="background-image"]'))
-        .map(elem => {
-            const style = elem.style.backgroundImage;
-            return style.slice(5, -2); // Remove url(" and ")
-        });
+        .map(elem => elem.style.backgroundImage.slice(5, -2));
 
-    // Extract images from background attributes
     const backgroundAttrImages = Array.from(doc.querySelectorAll('[background]'))
         .map(elem => elem.getAttribute('background'));
 
-    // Extract images from VML v:fill tags
     const vmlImages = Array.from(doc.querySelectorAll('v\\:fill, v\\:image'))
         .map(vml => vml.getAttribute('src'))
         .filter(Boolean);
 
     const styleTags = Array.from(doc.querySelectorAll('style'));
-        let styleBackgroundImages = [];
-        styleTags.forEach(style => {
-            const matches = style.innerHTML.match(/url\(['"]?(.*?)['"]?\)/g);
-            if (matches) {
-                const urls = matches.map(match => match.slice(4, -1).replace(/['"]/g, '')); // Extracting the URL from url('')
-                styleBackgroundImages = styleBackgroundImages.concat(urls);
-            }
-        });
+    let styleBackgroundImages = [];
+    const regex = /url\(['"]?(.*?)(?=['"]?\))/g;
+    styleTags.forEach(style => {
+        let match;
+        while (match = regex.exec(style.innerHTML)) {
+            styleBackgroundImages.push(match[1]);
+        }
+    });
 
-    const allSrcValues = srcValues.concat(inlineBackgroundImages, backgroundAttrImages, vmlImages);
+    const allSrcValues = srcValues.concat(inlineBackgroundImages, backgroundAttrImages, vmlImages, styleBackgroundImages);
 
-    if (images.length === 0) {
+    if (!images.length) {
         document.getElementById('imageError').style.display = 'block';
         return; 
     } else {
         document.getElementById('imageError').style.display = 'none';
     }
 
-    if (htmlContent.trim() === '') {
+    if (!htmlContent.trim()) {
         document.getElementById('htmlError').style.display = 'block';
         return;  
     } else {
@@ -70,25 +60,37 @@ document.getElementById('compareButton').addEventListener('click', function() {
     }
 
     const missingImages = imageNames.filter(name => !allSrcValues.some(src => src.includes(name)));
-
     const missingImagesList = document.getElementById('missingImagesList');
     missingImagesList.innerHTML = '';
 
     missingImages.forEach(img => {
         const listItem = document.createElement('li');
         listItem.textContent = img;
+
+        listItem.addEventListener('click', function() {
+            navigator.clipboard.writeText(img).then(function() {
+                console.log('Copying was successful.');
+                listItem.style.color = 'rgb(202, 202, 208)'; 
+            }, function(err) {
+                console.error('Could not copy text: ', err);
+            });
+        });
+
+        listItem.style.cursor = 'pointer';
         missingImagesList.appendChild(listItem);
     });
 
     if (missingImages.length > 0) {
-        document.querySelector('.missing-images').style.display = 'block';
+        document.querySelector('.missing-images').style.display = 'block'; // Show the section for missing images
+        document.querySelector('.success-message').style.display = 'none'; // Hide the success message
     } else {
-        document.querySelector('.missing-images').style.display = 'none'; 
-        document.querySelector('.success-message').style.display = 'block'; 
+        document.querySelector('.missing-images').style.display = 'none'; // Hide the section for missing images
+        document.querySelector('.success-message').style.display = 'block'; // Show the success message
     }
+    
 });
 
 window.onload = function() {
-    document.getElementById('imageInput').value = ''; 
-    document.getElementById('htmlTextarea').value = ''; 
+    document.getElementById('imageInput').value = '';
+    document.getElementById('htmlTextarea').value = '';
 }
