@@ -1,0 +1,58 @@
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>ImageSpy</title>
+        <link rel="stylesheet" href="styles.css">
+    </head>
+    <body id="body">
+
+    <div class="container">
+        <h1>ImageSpy</h1>
+        <p class="description">
+            ImageSpy helps ensure that all uploaded images are being utilized within your HTML email campaigns. 
+        </p>
+
+        <details class="instructions">
+            <summary>How to Use:</summary>
+            <ol>
+                <li>Drag and drop or upload your campaign images.</li>
+                <li>Paste your HTML content into the provided textarea.</li>
+                <li>Click the "Test" button to verify if all images are being used.</li>
+                <li>Any unused images will be displayed below.</li>
+            </ol>
+        </details>
+        
+        <!-- Image Upload Component -->
+        <div class="image-upload">
+            <label for="imageInput">Upload Images: <span id="imageError" style="color: #ff4040; display: none;"><i>*Images MUST be provided.*</i></span></label>
+            <input type="file" id="imageInput" multiple accept="image/*" required>
+        </div>
+
+        <!-- HTML Input Component -->
+        <div class="html-input">   
+            <label for="htmlTextarea">Paste your HTML: <span id="htmlError" style="color: #ff4040; display: none;"><i>*HTML field cannot be empty.*</i></span></label>
+            <textarea id="htmlTextarea" rows="10" cols="50" placeholder="Paste HTML in here" required></textarea>
+        </div>
+        
+        <!-- Compare/Test Button -->
+        <button id="compareButton">Test</button>
+        
+        <!-- Display Component for Missing Images -->
+        <div class="missing-images">
+            <h2>Images not being used:</h2>
+            <ol id="missingImagesList"></ol>
+        </div>
+
+        <!-- Display Component if all Images are present -->
+        <div class="success-message">
+            <h2>All images are being used.</h2>
+        </div>
+
+    </div>
+
+    <script src="app.js"></script>
+
+    </body>
+    </html>
