@@ -22,6 +22,7 @@ body {
     padding: 30px;
     max-width: 600px;
     margin: 0 auto;
+    overflow: hidden; /* No overflow */
 }
 
 h1 {
@@ -105,7 +106,6 @@ button:hover {
     padding: 20px;
     border-radius: 4px;
     margin-bottom: 20px;
-    font-size: 18px;
 }
 
 .instructions h2 {
@@ -117,8 +117,7 @@ button:hover {
 
 .instructions ol {
     padding-left: 20px;
-    margin: 15px 0;
-    font-size: 16px;
+    padding-top: 10px;
 }
 
 .instructions li {
@@ -149,4 +148,11 @@ button:hover {
 
 .instructions[open] summary:after {
     transform: rotate(90deg);
+}
+
+/* New styles for the list items in the "Images not being used" section */
+.missing-images ol li {
+    padding: 5px 0; /* Top and bottom padding */
+    word-wrap: break-word; /* Break long words */
+    overflow-wrap: break-word; /* Break long words */
 }
