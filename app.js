@@ -43,6 +43,16 @@ document.getElementById('compareButton').addEventListener('click', function() {
         .map(vml => vml.getAttribute('src'))
         .filter(Boolean);
 
+    const styleTags = Array.from(doc.querySelectorAll('style'));
+        let styleBackgroundImages = [];
+        styleTags.forEach(style => {
+            const matches = style.innerHTML.match(/url\(['"]?(.*?)['"]?\)/g);
+            if (matches) {
+                const urls = matches.map(match => match.slice(4, -1).replace(/['"]/g, '')); // Extracting the URL from url('')
+                styleBackgroundImages = styleBackgroundImages.concat(urls);
+            }
+        });
+
     const allSrcValues = srcValues.concat(inlineBackgroundImages, backgroundAttrImages, vmlImages);
 
     if (images.length === 0) {
